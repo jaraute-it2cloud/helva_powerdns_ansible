@@ -47,13 +47,13 @@ Build/Install als Collection (lokal):
 
 ```bash
 ansible-galaxy collection build
-ansible-galaxy collection install ./helvascale-helva_powerdns_ansible-1.0.2.tar.gz
+ansible-galaxy collection install ./helvascale-helva_powerdns_ansible-1.0.4.tar.gz
 ```
 
 Direkt aus Git mit explizitem Tag (Update erzwingen):
 
 ```bash
-ansible-galaxy collection install --force git+https://github.com/jaraute-it2cloud/helva_powerdns_ansible.git,v1.0.2
+ansible-galaxy collection install --force git+https://github.com/jaraute-it2cloud/helva_powerdns_ansible.git,v1.0.4
 ```
 
 Nutzung im Playbook:
