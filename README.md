@@ -8,7 +8,7 @@ Dieses Projekt ist eine Weiterentwicklung von:
 - Ursprungs-Repository: <https://github.com/Nosmoht/ansible-module-powerdns>
 - Ursprünglicher Autor: Thomas Krahn (@nosmoht)
 
-Copyright 2026 Helvascale GmbH
+Copyright 2026 IT2Cloud GmbH
 
 Lizenz: Apache-2.0 (siehe `LICENSE` und `NOTICE`).
 
