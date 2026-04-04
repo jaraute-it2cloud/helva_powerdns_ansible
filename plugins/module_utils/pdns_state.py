@@ -30,6 +30,27 @@ def normalize_zone_or_variant_name(name: str) -> str:
     return ensure_trailing_dot(candidate)
 
 
+def canonical_record_name_for_zone(name: str, zone: str) -> tuple[str, str]:
+    canonical_zone = normalize_zone_or_variant_name(zone)
+    candidate = name.strip()
+
+    if ".." in canonical_zone:
+        candidate = candidate.rstrip(".")
+        zone_with_dot = f"{canonical_zone}."
+
+        if candidate.endswith(zone_with_dot):
+            return candidate, canonical_zone
+        if candidate.endswith(canonical_zone):
+            return f"{candidate}.", canonical_zone
+
+        return f"{candidate}.{canonical_zone}.", canonical_zone
+
+    candidate = ensure_trailing_dot(candidate)
+    if not candidate.endswith(canonical_zone):
+        candidate = ensure_trailing_dot(f"{candidate.rstrip('.')}.{canonical_zone.rstrip('.')}")
+    return candidate, canonical_zone
+
+
 def sanitize_record_content(record_type: str, content: list[str] | None) -> list[str]:
     if content is None:
         return []

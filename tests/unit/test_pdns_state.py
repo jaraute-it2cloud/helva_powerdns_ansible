@@ -51,6 +51,22 @@ class TestPowerDNSStateHelpers(unittest.TestCase):
             "example.org..internal",
         )
 
+    def test_canonical_record_name_for_variant_zone(self):
+        record_name, zone_name = pdns_state.canonical_record_name_for_zone(
+            "www",
+            "example.org..internal",
+        )
+        self.assertEqual(zone_name, "example.org..internal")
+        self.assertEqual(record_name, "www.example.org..internal.")
+
+    def test_canonical_record_name_for_variant_zone_preserves_canonical_input(self):
+        record_name, zone_name = pdns_state.canonical_record_name_for_zone(
+            "www.example.org..internal.",
+            "example.org..internal",
+        )
+        self.assertEqual(zone_name, "example.org..internal")
+        self.assertEqual(record_name, "www.example.org..internal.")
+
     def test_zone_variant_rejects_duplicate_zone_base(self):
         with self.assertRaises(ValueError):
             pdns_state.normalize_zone_variants(

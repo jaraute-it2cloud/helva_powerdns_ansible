@@ -134,26 +134,14 @@ from ansible_collections.helvascale.helva_powerdns_ansible.plugins.module_utils.
     common_connection_argument_spec,
 )
 from ansible_collections.helvascale.helva_powerdns_ansible.plugins.module_utils.pdns_state import (
-    ensure_trailing_dot,
+    canonical_record_name_for_zone,
     matches_existing_content,
-    normalize_zone_or_variant_name,
     sanitize_record_content,
 )
 
 
 def _canonical_record_name(name, zone):
-    canonical_zone = normalize_zone_or_variant_name(zone)
-
-    if ".." in canonical_zone:
-        canonical_name = name.strip().rstrip(".")
-        if not canonical_name.endswith(canonical_zone):
-            canonical_name = f"{canonical_name}.{canonical_zone}"
-    else:
-        canonical_name = ensure_trailing_dot(name.strip())
-        if not canonical_name.endswith(canonical_zone):
-            canonical_name = ensure_trailing_dot(f"{canonical_name.rstrip('.')}.{canonical_zone.rstrip('.')}")
-
-    return canonical_name, canonical_zone
+    return canonical_record_name_for_zone(name, zone)
 
 
 def _extract_rrset(client, server, zone, name, record_type):
