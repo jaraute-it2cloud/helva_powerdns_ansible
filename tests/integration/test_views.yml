@@ -1,0 +1,34 @@
+---
+- name: Integration test for PowerDNS views modules
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - helvascale.helva_powerdns_ansible
+  vars:
+    pdns_host: "{{ pdns_host | default(lookup('env', 'PDNS_HOST')) }}"
+    pdns_api_key: "{{ pdns_api_key | default(lookup('env', 'PDNS_API_KEY')) }}"
+  tasks:
+    - name: Ensure required integration vars are set
+      ansible.builtin.assert:
+        that:
+          - pdns_host | length > 0
+          - pdns_api_key | length > 0
+        fail_msg: "Set pdns_host/pdns_api_key via vars or environment"
+
+    - name: Ensure integration view exists
+      powerdns_view:
+        name: integration-test
+        mode: replace
+        zone_variants:
+          - example.org..integration
+        state: present
+        pdns_host: "{{ pdns_host }}"
+        pdns_api_key: "{{ pdns_api_key }}"
+
+    - name: Ensure integration network mapping exists
+      powerdns_view_network:
+        network: 198.51.100.0/24
+        view: integration-test
+        state: present
+        pdns_host: "{{ pdns_host }}"
+        pdns_api_key: "{{ pdns_api_key }}"

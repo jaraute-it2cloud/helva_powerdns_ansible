@@ -1,0 +1,14 @@
+---
+- name: Assign network to a view
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - helvascale.helva_powerdns_ansible
+  tasks:
+    - name: Map private network to internal view
+      powerdns_view_network:
+        network: 192.168.0.0/16
+        view: internal
+        state: present
+        pdns_host: powerdns.example.org
+        pdns_api_key: "{{ vault_pdns_api_key }}"

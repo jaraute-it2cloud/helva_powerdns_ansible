@@ -1,0 +1,45 @@
+---
+- name: Internal/external split-DNS via PowerDNS Views
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - helvascale.helva_powerdns_ansible
+  vars:
+    pdns_host: powerdns.example.org
+    pdns_api_key: "{{ vault_pdns_api_key }}"
+  tasks:
+    - name: Ensure internal view contains internal variant
+      powerdns_view:
+        name: internal
+        mode: add
+        zone_variants:
+          - example.org..internal
+        state: present
+        pdns_host: "{{ pdns_host }}"
+        pdns_api_key: "{{ pdns_api_key }}"
+
+    - name: Ensure external view contains public variant
+      powerdns_view:
+        name: external
+        mode: add
+        zone_variants:
+          - example.org..external
+        state: present
+        pdns_host: "{{ pdns_host }}"
+        pdns_api_key: "{{ pdns_api_key }}"
+
+    - name: Map RFC1918 space to internal view
+      powerdns_view_network:
+        network: 10.0.0.0/8
+        view: internal
+        state: present
+        pdns_host: "{{ pdns_host }}"
+        pdns_api_key: "{{ pdns_api_key }}"
+
+    - name: Map default IPv4 to external view
+      powerdns_view_network:
+        network: 0.0.0.0/0
+        view: external
+        state: present
+        pdns_host: "{{ pdns_host }}"
+        pdns_api_key: "{{ pdns_api_key }}"

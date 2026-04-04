@@ -1,0 +1,7 @@
+Copyright 2026 Helvascale GmbH
+
+This project is based on:
+- https://github.com/Nosmoht/ansible-module-powerdns
+- Original author: Thomas Krahn (@nosmoht)
+
+The project is distributed under the Apache License, Version 2.0.

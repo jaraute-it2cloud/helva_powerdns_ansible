@@ -1,0 +1,23 @@
+namespace: helvascale
+name: helva_powerdns_ansible
+version: 1.0.0
+readme: README.md
+authors:
+  - Helvascale GmbH
+description: Manage PowerDNS zones, records, views and network mappings via Ansible.
+license:
+  - Apache-2.0
+tags:
+  - dns
+  - powerdns
+  - authoritative
+  - views
+repository: https://github.com/helvascale/helva_powerdns_ansible
+homepage: https://github.com/helvascale/helva_powerdns_ansible
+issues: https://github.com/helvascale/helva_powerdns_ansible/issues
+build_ignore:
+  - .git
+  - .venv
+  - __pycache__
+  - '*.pyc'
+  - '*.pyo'

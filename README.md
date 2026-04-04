@@ -1,165 +1,128 @@
-***IMPORTANT NOTE***
+# helvascale.helva_powerdns_ansible
 
-*As i'm not using PowerDNS anymore i will not activly work on the library. Only merging your PR's.
-If anyone wants to add the library to the official Ansible module library feel free to do so. Just please add a note about me as the original author and a link to this repo :-)*
+Ansible Collection zur Verwaltung von PowerDNS Authoritative über die HTTP API, erweitert um Views, Zone-Varianten und Network-to-View-Mappings.
 
-PowerDNS Ansible library
-==========
-- [Introduction](#introduction)
-- [Usage](#usage)
-  - [Zones](#zones)
-  - [Records](#records)
+## Herkunft und Attribution
 
-# Usage
+Dieses Projekt ist eine Weiterentwicklung von:
+- Ursprungs-Repository: <https://github.com/Nosmoht/ansible-module-powerdns>
+- Ursprünglicher Autor: Thomas Krahn (@nosmoht)
 
-## Zones
-Ensure zone is present
+Copyright 2026 Helvascale GmbH
 
-```yaml
-- powerdns_zone:
-    name: zone01.internal.example.com.
-    nameservers:
-    - ns-01.example.com.
-    - ns-02.example.com.
-    kind: master
-    state: present
-    pdns_host: powerdns.example.com
-    pdns_port: 8081
-    pdns_api_key: topsecret
+Lizenz: Apache-2.0 (siehe `LICENSE` und `NOTICE`).
+
+## Projektziel
+
+Produktionsreife Verwaltung von:
+- Zonen
+- Records
+- Views
+- Networks (Zuordnung Network -> View)
+
+mit idempotentem Verhalten, `check_mode` und diff-fähiger Ergebnisdarstellung.
+
+## Unterstützte Module
+
+- `helvascale.helva_powerdns_ansible.powerdns_zone`
+- `helvascale.helva_powerdns_ansible.powerdns_record`
+- `helvascale.helva_powerdns_ansible.powerdns_view`
+- `helvascale.helva_powerdns_ansible.powerdns_view_network`
+
+## Voraussetzungen
+
+- Ansible Core `>= 2.15`
+- Python 3.9+
+- PowerDNS Authoritative mit aktivierter HTTP API
+- Für Views:
+1. PowerDNS Authoritative `>= 5.0.0`
+2. Views sind laut PowerDNS-Dokumentation experimentell
+3. `views` muss in PowerDNS aktiviert sein
+4. Zone-Cache muss aktiv sein (`zone-cache-refresh-interval` > 0)
+5. Laut offizieller Doku derzeit sinnvoll mit LMDB-Backend
+
+## Installation
+
+Build/Install als Collection (lokal):
+
+```bash
+ansible-galaxy collection build
+ansible-galaxy collection install ./helvascale-helva_powerdns_ansible-1.0.0.tar.gz
 ```
 
-Ensure zone is absent
-```yaml
-- powerdns_zone:
-    name: zone02.internal.example.com
-    state: absent
-    pdns_host: powerdns.example.com
-    pdns_port: 8081
-    pdns_api_key: topsecret
-```
-
-## Records
-
-Ensure A record
-```yaml
-- powerdns_record:
-    name: host01.zone01.internal.example.com.
-    zone: zone01.internal.example.com
-    type: A
-    content: 192.168.1.234
-    ttl: 1440
-    pdns_host: powerdns.example.com
-    pdns_port: 443
-    pdns_api_key: topsecret
-    pdns_prot: https
-```
-
-Absent all A record: this will delete all A record, even you specified ip in content
-```yaml
-- powerdns_record:
-    name: host01.zone01.internal.example.com.
-    state: absent
-    zone: zone01.internal.example.com
-    type: A
-    content: 192.168.1.234
-    ttl: 1440
-    pdns_host: powerdns.example.com
-    pdns_port: 443
-    pdns_api_key: topsecret
-    pdns_prot: https
-```
-
-Absent particular A record: this will remove only one A record for specific ip
-```yaml
-- powerdns_record:
-    name: host01.zone01.internal.example.com.
-    state: absent
-    exclusive: false
-    zone: zone01.internal.example.com
-    type: A
-    content: 192.168.1.234
-    ttl: 1440
-    pdns_host: powerdns.example.com
-    pdns_port: 443
-    pdns_api_key: topsecret
-    pdns_prot: https
-```
-
-
-
-Ensure AAAA record
-```yaml
-- powerdns_record:
-    name: host01.zone01.internal.example.com.
-    zone: zone01.internal.example.com
-    type: AAAA
-    content: 2001:cdba:0000:0000:0000:0000:3257:9652
-    ttl: 1440
-    pdns_host: powerdns.example.com
-    pdns_port: 8443
-    pdns_api_key: topsecret
-    pdns_prot: https
-```
-
-Do not verify SSL certificate (this is a security risk)
+Nutzung im Playbook:
 
 ```yaml
-- powerdns_record:
-    name: host01.zone01.internal.example.com.
-    zone: zone01.internal.example.com
-    type: AAAA
-    content: 2001:cdba:0000:0000:0000:0000:3257:9652
-    ttl: 1440
-    pdns_host: powerdns.example.com
-    pdns_port: 8443
-    pdns_api_key: topsecret
-    pdns_prot: https
-    strict_ssl_checking: false
+collections:
+  - helvascale.helva_powerdns_ansible
 ```
 
-Ensure CNAME record
-```yaml
-- powerdns_record:
-    name: database.zone01.internal.example.com.
-    zone: zone01.internal.example.com
-    type: CNAME
-    content: host01.zone01.internal.example.com
-    pdns_host: powerdns.example.com
-    pdns_port: 80
-    pdns_api_key: topsecret
-    pdns_prot: http
+## Gemeinsame Verbindungsparameter
+
+Alle Module unterstützen:
+- `pdns_host`
+- `pdns_port`
+- `pdns_prot` (`http`/`https`)
+- `strict_ssl_checking` (TLS-Validierung standardmäßig aktiv)
+- API-Key (`pdns_api_key`) oder Basic Auth (`pdns_api_username`/`pdns_api_password`)
+
+## Beispiele
+
+Siehe `examples/`:
+- `view_create.yml`
+- `view_delete.yml`
+- `view_replace_zone_variants.yml`
+- `network_assign_view.yml`
+- `split_dns_internal_external.yml`
+
+## Architektur
+
+- `plugins/module_utils/pdns_client.py`:
+  - zentraler PowerDNS HTTP-Client
+  - konsistente Fehlerbehandlung
+  - optionale `pdnsutil`-Ausführung für API-Lücken
+- `plugins/module_utils/pdns_state.py`:
+  - Validierung und Zustandsberechnung (View- und Network-Logik)
+- `plugins/modules/*`:
+  - Ansible-Module mit idempotenter Soll/Ist-Abgleichslogik
+
+## API-/Mechanismus-Abdeckung
+
+HTTP API (primär):
+- Zonen: `/servers/{server}/zones`
+- Suche/Records: `/servers/{server}/search-data`
+- Views: `/servers/{server}/views`
+- Networks: `/servers/{server}/networks`
+
+`pdnsutil` (gezielt, optional):
+- Entfernen eines Network-Mappings (`state: absent` in `powerdns_view_network`) kann über `pdnsutil network set <cidr>` erfolgen, da die HTTP API keinen dokumentierten DELETE-Endpunkt für Networks bereitstellt.
+
+## Einschränkungen / bekannte Grenzen
+
+- Das explizite Anlegen einer komplett leeren View ist weder über die dokumentierte HTTP API noch robust über einen dedizierten Endpunkt möglich. Views entstehen effektiv durch Zuordnung von Zone-Varianten.
+- `powerdns_view state=absent` entfernt alle aktuell eingetragenen Zone-Varianten der View (idempotent).
+- Zone-Varianten werden gemäß PowerDNS-Logik erwartet (z. B. `example.org..internal`).
+
+## Qualitätssicherung
+
+- Unit-Tests: `tests/unit/`
+- Linting: `ruff`
+
+Lokal ausführen:
+
+```bash
+python3 -m unittest discover -s tests/unit -p 'test_*.py'
+ruff check .
 ```
 
-Ensure multiple MX records
-```yaml
-- powerdns_record:
-    name: zone01.internal.example.com.
-    zone: zone01.internal.example.com
-    type: MX
-    content:
-      - 10 mx1.zone01.internal.example.com
-      - 10 mx2.zone01.internal.example.com
-    pdns_host: powerdns.example.com
-    pdns_port: 80
-    pdns_api_key: topsecret
-    pdns_prot: http
+Optional (wenn `ansible-test` verfügbar ist):
+
+```bash
+ansible-test sanity
 ```
 
-Use HTTP Basic Auth instead of API Key
-```yaml
-- powerdns_record:
-    name: database.zone01.internal.example.com.
-    zone: zone01.internal.example.com
-    type: CNAME
-    content: host01.zone01.internal.example.com
-    pdns_host: powerdns.example.com
-    pdns_port: 80
-    pdns_api_username: myuser
-    pdns_api_password: mytopsecretpassword
-    pdns_prot: http
-```
+## Sicherheitshinweise
 
-`pdns_api_key` takes preference if both `pdns_api_key` and `pdns_api_username`/`pdns_api_password` are supplied.
-
-
-Note the trailing '.' following most records, if not present will result in the error "Domain record is not canonical".
+- Keine Secrets in Beispielen oder Tests.
+- TLS-Verifikation ist standardmäßig aktiv (`strict_ssl_checking: true`).
+- Bei Deaktivierung der TLS-Prüfung steigt das Risiko von MITM-Angriffen.

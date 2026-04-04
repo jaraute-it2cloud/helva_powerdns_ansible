@@ -1,0 +1,17 @@
+---
+- name: Replace zone variants in a view
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - helvascale.helva_powerdns_ansible
+  tasks:
+    - name: Replace trusted view variants
+      powerdns_view:
+        name: trusted
+        mode: replace
+        zone_variants:
+          - example.org..trusted
+          - corp.example.org..trusted
+        state: present
+        pdns_host: powerdns.example.org
+        pdns_api_key: "{{ vault_pdns_api_key }}"

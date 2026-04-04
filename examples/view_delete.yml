@@ -1,0 +1,15 @@
+---
+- name: Delete view by removing all mappings
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - helvascale.helva_powerdns_ansible
+  tasks:
+    - name: Ensure view is absent
+      powerdns_view:
+        name: internal
+        state: absent
+        pdns_host: powerdns.example.org
+        pdns_prot: https
+        strict_ssl_checking: true
+        pdns_api_key: "{{ vault_pdns_api_key }}"
