@@ -35,15 +35,15 @@ def canonical_record_name_for_zone(name: str, zone: str) -> tuple[str, str]:
     candidate = name.strip()
 
     if ".." in canonical_zone:
-        candidate = candidate.rstrip(".")
-        zone_with_dot = f"{canonical_zone}."
+        base_zone = ensure_trailing_dot(canonical_zone.split("..", 1)[0])
 
-        if candidate.endswith(zone_with_dot):
-            return candidate, canonical_zone
-        if candidate.endswith(canonical_zone):
-            return f"{candidate}.", canonical_zone
+        candidate = ensure_trailing_dot(candidate)
+        if not candidate.endswith(base_zone):
+            candidate = ensure_trailing_dot(
+                f"{candidate.rstrip('.')}.{base_zone.rstrip('.')}"
+            )
 
-        return f"{candidate}.{canonical_zone}.", canonical_zone
+        return candidate, canonical_zone
 
     candidate = ensure_trailing_dot(candidate)
     if not candidate.endswith(canonical_zone):

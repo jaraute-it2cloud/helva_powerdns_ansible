@@ -57,15 +57,23 @@ class TestPowerDNSStateHelpers(unittest.TestCase):
             "example.org..internal",
         )
         self.assertEqual(zone_name, "example.org..internal")
-        self.assertEqual(record_name, "www.example.org..internal.")
+        self.assertEqual(record_name, "www.example.org.")
 
     def test_canonical_record_name_for_variant_zone_preserves_canonical_input(self):
         record_name, zone_name = pdns_state.canonical_record_name_for_zone(
-            "www.example.org..internal.",
+            "www.example.org.",
             "example.org..internal",
         )
         self.assertEqual(zone_name, "example.org..internal")
-        self.assertEqual(record_name, "www.example.org..internal.")
+        self.assertEqual(record_name, "www.example.org.")
+
+    def test_canonical_record_name_for_variant_zone_soa_name(self):
+        record_name, zone_name = pdns_state.canonical_record_name_for_zone(
+            "atlas.b04.durr-lab.int",
+            "atlas.b04.durr-lab.int..atlas-internal",
+        )
+        self.assertEqual(zone_name, "atlas.b04.durr-lab.int..atlas-internal")
+        self.assertEqual(record_name, "atlas.b04.durr-lab.int.")
 
     def test_zone_variant_rejects_duplicate_zone_base(self):
         with self.assertRaises(ValueError):
