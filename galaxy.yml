@@ -1,6 +1,6 @@
 namespace: helvascale
 name: helva_powerdns_ansible
-version: 1.0.4
+version: 1.0.5
 readme: README.md
 authors:
   - Helvascale GmbH
