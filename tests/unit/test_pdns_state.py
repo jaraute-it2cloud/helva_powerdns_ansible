@@ -39,6 +39,18 @@ class TestPowerDNSStateHelpers(unittest.TestCase):
         variants = pdns_state.normalize_zone_variants(["example.org..internal", "example.net..trusted"])
         self.assertEqual(sorted(variants), ["example.net..trusted", "example.org..internal"])
 
+    def test_normalize_zone_or_variant_name_regular_zone(self):
+        self.assertEqual(
+            pdns_state.normalize_zone_or_variant_name("example.org"),
+            "example.org.",
+        )
+
+    def test_normalize_zone_or_variant_name_variant_zone(self):
+        self.assertEqual(
+            pdns_state.normalize_zone_or_variant_name("example.org..internal."),
+            "example.org..internal",
+        )
+
     def test_zone_variant_rejects_duplicate_zone_base(self):
         with self.assertRaises(ValueError):
             pdns_state.normalize_zone_variants(

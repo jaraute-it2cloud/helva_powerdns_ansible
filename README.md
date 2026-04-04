@@ -31,7 +31,7 @@ mit idempotentem Verhalten, `check_mode` und diff-fähiger Ergebnisdarstellung.
 
 ## Voraussetzungen
 
-- Ansible Core `>= 2.15`
+- Ansible Core `>= 2.14`
 - Python 3.9+
 - PowerDNS Authoritative mit aktivierter HTTP API
 - Für Views:
@@ -103,6 +103,7 @@ HTTP API (primär):
 - Das explizite Anlegen einer komplett leeren View ist weder über die dokumentierte HTTP API noch robust über einen dedizierten Endpunkt möglich. Views entstehen effektiv durch Zuordnung von Zone-Varianten.
 - `powerdns_view state=absent` entfernt alle aktuell eingetragenen Zone-Varianten der View (idempotent).
 - Zone-Varianten werden gemäß PowerDNS-Logik erwartet (z. B. `example.org..internal`).
+- Bei Variant-Zonen darf kein zusätzlicher abschließender Punkt verwendet werden (korrekt: `example.org..internal`, nicht `example.org..internal.`).
 
 ## Qualitätssicherung
 

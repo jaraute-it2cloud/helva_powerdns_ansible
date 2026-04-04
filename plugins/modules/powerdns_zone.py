@@ -19,7 +19,8 @@ options:
   name:
     description:
       - Zone name.
-      - A trailing dot is added automatically if missing.
+      - A trailing dot is added automatically for regular zones.
+      - Zone variants keep PowerDNS variant form, e.g. C(example.org..internal).
     type: str
     required: true
   kind:
@@ -114,6 +115,7 @@ from ansible_collections.helvascale.helva_powerdns_ansible.plugins.module_utils.
 )
 from ansible_collections.helvascale.helva_powerdns_ansible.plugins.module_utils.pdns_state import (
     ensure_trailing_dot,
+    normalize_zone_or_variant_name,
 )
 
 MANAGED_FIELDS = ("kind", "nameservers", "masters")
@@ -151,7 +153,7 @@ def _extract_managed(zone_payload):
 
 def ensure_zone(module, client):
     server = module.params["server"]
-    zone_name = ensure_trailing_dot(module.params["name"].strip())
+    zone_name = normalize_zone_or_variant_name(module.params["name"])
     state = module.params["state"]
 
     zone = client.get_zone(server, zone_name)

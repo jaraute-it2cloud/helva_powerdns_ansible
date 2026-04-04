@@ -25,6 +25,7 @@ options:
   zone:
     description:
       - Zone name where the record lives.
+      - Zone variants use PowerDNS variant form without final dot, e.g. C(example.org..internal).
     type: str
     required: true
   type:
@@ -135,16 +136,22 @@ from ansible_collections.helvascale.helva_powerdns_ansible.plugins.module_utils.
 from ansible_collections.helvascale.helva_powerdns_ansible.plugins.module_utils.pdns_state import (
     ensure_trailing_dot,
     matches_existing_content,
+    normalize_zone_or_variant_name,
     sanitize_record_content,
 )
 
 
 def _canonical_record_name(name, zone):
-    canonical_name = ensure_trailing_dot(name.strip())
-    canonical_zone = ensure_trailing_dot(zone.strip())
+    canonical_zone = normalize_zone_or_variant_name(zone)
 
-    if not canonical_name.endswith(canonical_zone):
-        canonical_name = ensure_trailing_dot(f"{canonical_name.rstrip('.')}.{canonical_zone.rstrip('.')}")
+    if ".." in canonical_zone:
+        canonical_name = name.strip().rstrip(".")
+        if not canonical_name.endswith(canonical_zone):
+            canonical_name = f"{canonical_name}.{canonical_zone}"
+    else:
+        canonical_name = ensure_trailing_dot(name.strip())
+        if not canonical_name.endswith(canonical_zone):
+            canonical_name = ensure_trailing_dot(f"{canonical_name.rstrip('.')}.{canonical_zone.rstrip('.')}")
 
     return canonical_name, canonical_zone
 

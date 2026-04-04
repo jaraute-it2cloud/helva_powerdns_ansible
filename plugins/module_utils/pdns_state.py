@@ -17,6 +17,19 @@ def ensure_trailing_dot(name: str) -> str:
     return f"{name}."
 
 
+def normalize_zone_or_variant_name(name: str) -> str:
+    candidate = name.strip()
+    if not candidate:
+        raise ValueError("zone name must not be empty")
+
+    # Zone variants follow '<zone-with-trailing-dot>.<variant>' and therefore
+    # intentionally do not end with a trailing dot.
+    if ".." in candidate:
+        return candidate.rstrip(".")
+
+    return ensure_trailing_dot(candidate)
+
+
 def sanitize_record_content(record_type: str, content: list[str] | None) -> list[str]:
     if content is None:
         return []
