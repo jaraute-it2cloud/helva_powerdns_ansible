@@ -50,10 +50,10 @@ ansible-galaxy collection build
 ansible-galaxy collection install ./helvascale-helva_powerdns_ansible-1.0.5.tar.gz
 ```
 
-Direkt aus Git mit explizitem Tag (Update erzwingen):
+Direkt aus Git:
 
 ```bash
-ansible-galaxy collection install --force git+https://github.com/jaraute-it2cloud/helva_powerdns_ansible.git,v1.0.5
+ansible-galaxy collection install --force git+https://github.com/jaraute-it2cloud/helva_powerdns_ansible.git
 ```
 
 Nutzung im Playbook:
@@ -110,27 +110,3 @@ HTTP API (primär):
 - `powerdns_view state=absent` entfernt alle aktuell eingetragenen Zone-Varianten der View (idempotent).
 - Zone-Varianten werden gemäß PowerDNS-Logik erwartet (z. B. `example.org..internal`).
 - Bei Variant-Zonen darf kein zusätzlicher abschließender Punkt verwendet werden (korrekt: `example.org..internal`, nicht `example.org..internal.`).
-
-## Qualitätssicherung
-
-- Unit-Tests: `tests/unit/`
-- Linting: `ruff`
-
-Lokal ausführen:
-
-```bash
-python3 -m unittest discover -s tests/unit -p 'test_*.py'
-ruff check .
-```
-
-Optional (wenn `ansible-test` verfügbar ist):
-
-```bash
-ansible-test sanity
-```
-
-## Sicherheitshinweise
-
-- Keine Secrets in Beispielen oder Tests.
-- TLS-Verifikation ist standardmäßig aktiv (`strict_ssl_checking: true`).
-- Bei Deaktivierung der TLS-Prüfung steigt das Risiko von MITM-Angriffen.
