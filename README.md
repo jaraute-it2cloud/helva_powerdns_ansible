@@ -74,6 +74,7 @@ Siehe `examples/`:
 - `view_replace_zone_variants.yml`
 - `network_assign_view.yml`
 - `split_dns_internal_external.yml`
+- `split_dns_different_ttl.yml`
 
 ## Architektur
 

@@ -1,0 +1,64 @@
+---
+- name: Split-DNS with different TTL per view (via zone variants)
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - helvascale.helva_powerdns_ansible
+  vars:
+    pdns_host: powerdns.example.org
+    pdns_api_key: "{{ vault_pdns_api_key }}"
+  tasks:
+    - name: Ensure internal and external views reference the correct variants
+      powerdns_view:
+        name: "{{ item.view }}"
+        mode: add
+        zone_variants:
+          - "{{ item.variant_zone }}"
+        state: present
+        pdns_host: "{{ pdns_host }}"
+        pdns_api_key: "{{ pdns_api_key }}"
+      loop:
+        - view: internal
+          variant_zone: example.org..internal
+        - view: external
+          variant_zone: example.org..external
+
+    - name: Map internal clients to internal view
+      powerdns_view_network:
+        network: 10.0.0.0/8
+        view: internal
+        state: present
+        pdns_host: "{{ pdns_host }}"
+        pdns_api_key: "{{ pdns_api_key }}"
+
+    - name: Map all remaining IPv4 clients to external view
+      powerdns_view_network:
+        network: 0.0.0.0/0
+        view: external
+        state: present
+        pdns_host: "{{ pdns_host }}"
+        pdns_api_key: "{{ pdns_api_key }}"
+
+    - name: Internal variant record (short TTL)
+      powerdns_record:
+        name: www
+        zone: example.org..internal
+        type: A
+        content:
+          - 10.10.10.10
+        ttl: 60
+        state: present
+        pdns_host: "{{ pdns_host }}"
+        pdns_api_key: "{{ pdns_api_key }}"
+
+    - name: External variant record (longer TTL)
+      powerdns_record:
+        name: www
+        zone: example.org..external
+        type: A
+        content:
+          - 203.0.113.10
+        ttl: 300
+        state: present
+        pdns_host: "{{ pdns_host }}"
+        pdns_api_key: "{{ pdns_api_key }}"
