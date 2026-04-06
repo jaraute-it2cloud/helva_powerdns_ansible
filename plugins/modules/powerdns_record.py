@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright 2026 Helvascale GmbH
+# Copyright 2026 IT2Cloud GmbH
 # Based on work by Thomas Krahn (@nosmoht), https://github.com/Nosmoht/ansible-module-powerdns
 # Apache-2.0 (see LICENSE)
 
@@ -14,7 +14,7 @@ description:
   - Create, update or delete PowerDNS records using the Authoritative HTTP API.
 author:
   - Thomas Krahn (@nosmoht)
-  - Helvascale GmbH
+  - IT2Cloud GmbH
 options:
   name:
     description:

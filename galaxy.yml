@@ -3,7 +3,7 @@ name: helva_powerdns_ansible
 version: 1.0.5
 readme: README.md
 authors:
-  - Helvascale GmbH
+  - IT2Cloud GmbH
 description: Manage PowerDNS zones, records, views and network mappings via Ansible.
 license:
   - Apache-2.0

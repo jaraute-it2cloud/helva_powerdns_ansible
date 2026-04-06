@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright 2026 Helvascale GmbH
+# Copyright 2026 IT2Cloud GmbH
 # Based on work by Thomas Krahn (@nosmoht), https://github.com/Nosmoht/ansible-module-powerdns
 # Apache-2.0 (see LICENSE)
 
@@ -15,7 +15,7 @@ description:
   - Uses the PowerDNS HTTP API for create/update.
   - Uses optional C(pdnsutil) fallback for delete, because no documented HTTP DELETE endpoint exists.
 author:
-  - Helvascale GmbH
+  - IT2Cloud GmbH
 options:
   network:
     description:
