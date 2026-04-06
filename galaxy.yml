@@ -4,6 +4,8 @@ version: 1.0.5
 readme: README.md
 authors:
   - IT2Cloud GmbH
+  - Tim Schmidt
+  - Jan Rautenberg
 description: Manage PowerDNS zones, records, views and network mappings via Ansible.
 license:
   - Apache-2.0

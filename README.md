@@ -12,6 +12,10 @@ Copyright 2026 IT2Cloud GmbH
 
 Lizenz: Apache-2.0 (siehe `LICENSE` und `NOTICE`).
 
+Maintainer:
+- Tim Schmidt
+- Jan Rautenberg
+
 ## Projektziel
 
 Produktionsreife Verwaltung von:
