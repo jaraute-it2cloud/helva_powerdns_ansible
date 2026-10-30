@@ -101,7 +101,7 @@ Siehe `examples/`:
 
 HTTP API (primär):
 - Zonen: `/servers/{server}/zones`
-- Suche/Records: `/servers/{server}/search-data`
+- Records: exakter Zonen-GET und RRset-PATCH über `/servers/{server}/zones/{zone}`
 - Views: `/servers/{server}/views`
 - Networks: `/servers/{server}/networks`
 
@@ -114,3 +114,13 @@ HTTP API (primär):
 - `powerdns_view state=absent` entfernt alle aktuell eingetragenen Zone-Varianten der View (idempotent).
 - Zone-Varianten werden gemäß PowerDNS-Logik erwartet (z. B. `example.org..internal`).
 - Bei Variant-Zonen darf kein zusätzlicher abschließender Punkt verwendet werden (korrekt: `example.org..internal`, nicht `example.org..internal.`).
+- `powerdns_record` liest RRsets aus der exakt adressierten Zone und wählt den kanonischen Namen und Typ aus. Die Such-API wird dafür nicht verwendet; Suchtreffer dürfen keinen fehlenden Record vortäuschen. Unerwartete API-Antworten brechen den Abgleich ab. Eine vom API-Client als nicht vorhanden gemeldete Zone erlaubt weiterhin die Planung neuer Records im Check-Mode.
+
+## Record-Regressionstests
+
+Die Tests verwenden isolierte API-Antworten und führen keine Netzwerkanfragen aus:
+
+```bash
+python3 -m pip install -r requirements-dev.txt
+python3 -m unittest discover -s tests/unit -p 'test_*.py'
+```

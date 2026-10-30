@@ -145,29 +145,42 @@ def _canonical_record_name(name, zone):
 
 
 def _extract_rrset(client, server, zone, name, record_type):
-    results = client.search_records(server, name)
-
-    if not isinstance(results, list):
-        return {"name": name, "type": record_type, "ttl": None, "records": []}
-
+    # search-data is a search interface, not an exact RRset lookup. In
+    # particular, some backends return no results for a canonical FQDN with
+    # its trailing dot. Read the exact zone (including its view variant)
+    # instead, and retain the canonical name for matching and writes.
+    zone_data = client.get_zone(server, zone)
     rrset = {"name": name, "type": record_type, "ttl": None, "records": []}
-    for entry in results:
-        if entry.get("object_type") != "record":
-            continue
-        if entry.get("type") != record_type:
-            continue
-        if entry.get("name") != name:
-            continue
-        if entry.get("zone") != zone:
-            continue
+    # The client explicitly reports absent zones as None. Keep this case so a
+    # check-mode zone creation can be followed by planned record creation.
+    if zone_data is None:
+        return rrset
+    if not isinstance(zone_data, dict) or not isinstance(zone_data.get("rrsets"), list):
+        raise PowerDNSError("Cannot read RRsets from the requested zone")
 
-        if rrset["ttl"] is None:
-            rrset["ttl"] = entry.get("ttl")
+    matches = []
+    for entry in zone_data["rrsets"]:
+        if not isinstance(entry, dict) or not isinstance(entry.get("name"), str) or not isinstance(entry.get("type"), str):
+            raise PowerDNSError("Invalid RRset metadata in the requested zone")
+        if entry["name"] == name and entry["type"] == record_type:
+            matches.append(entry)
+    if len(matches) > 1:
+        raise PowerDNSError("Duplicate RRset in the requested zone")
 
+    if not matches:
+        return rrset
+
+    match = matches[0]
+    if type(match.get("ttl")) is not int or match["ttl"] < 0 or not isinstance(match.get("records"), list):
+        raise PowerDNSError("Invalid RRset data in the requested zone")
+    rrset["ttl"] = match["ttl"]
+    for entry in match["records"]:
+        if not isinstance(entry, dict) or not isinstance(entry.get("content"), str) or type(entry.get("disabled", False)) is not bool:
+            raise PowerDNSError("Invalid record data in the requested zone")
         rrset["records"].append(
             {
-                "content": entry.get("content"),
-                "disabled": bool(entry.get("disabled", False)),
+                "content": entry["content"],
+                "disabled": entry.get("disabled", False),
             }
         )
 
