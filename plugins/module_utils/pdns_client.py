@@ -94,7 +94,7 @@ class PowerDNSClient:
             headers["Content-Type"] = "application/json"
         return headers
 
-    def request(self, method, path_parts, payload=None, expected_codes=None, absent_codes=None, query=None):
+    def request(self, method, path_parts, payload=None, expected_codes=None, absent_codes=None, query=None, require_json_object=False):
         expected_codes = set(expected_codes or [200])
         absent_codes = set(absent_codes or [])
         query = query or {}
@@ -146,12 +146,19 @@ class PowerDNSClient:
             )
 
         if not text:
+            if require_json_object:
+                raise PowerDNSError("Expected a JSON object from PowerDNS", status_code=status_code, url=url)
             return {}
 
         try:
-            return json.loads(text)
-        except Exception:
+            result = json.loads(text)
+        except Exception as exc:
+            if require_json_object:
+                raise PowerDNSError("Expected a JSON object from PowerDNS", status_code=status_code, url=url) from exc
             return {"raw": text}
+        if require_json_object and not isinstance(result, dict):
+            raise PowerDNSError("Expected a JSON object from PowerDNS", status_code=status_code, url=url)
+        return result
 
     def get_zone(self, server, name):
         return self.request(
@@ -159,6 +166,9 @@ class PowerDNSClient:
             ["servers", server, "zones", name],
             expected_codes=[200],
             absent_codes=[404, 422],
+            # None is reserved for a confirmed absent status, never HTTP 200
+            # with a JSON null (or other malformed successful response).
+            require_json_object=True,
         )
 
     def create_zone(self, server, payload):
